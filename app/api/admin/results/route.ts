@@ -9,10 +9,7 @@ export async function GET(req: Request) {
     !isPublic &&
     req.headers.get('x-admin-password') !== process.env.ADMIN_PASSWORD
   ) {
-    return NextResponse.json(
-      { error: 'Brak dostępu.' },
-      { status: 401 }
-    );
+    return NextResponse.json({ error: 'Brak dostępu.' }, { status: 401 });
   }
 
   const sb = supabaseAdmin();
@@ -21,25 +18,24 @@ export async function GET(req: Request) {
     ? 'id,first_name,last_name,score,duration_ms,finished_at'
     : '*';
 
-  const { data, error } = await sb
+  const query = sb
     .from('quiz_attempts')
     .select(select)
     .eq('completed', true)
     .order('score', { ascending: false })
     .order('duration_ms', { ascending: true });
 
+  const { data, error } = await query;
+
   if (error) {
-    return NextResponse.json(
-      { error: error.message },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  const rows = (data ?? []) as any[];
+  const rows: any[] = data ? JSON.parse(JSON.stringify(data)) : [];
 
   return NextResponse.json({
     results: isPublic
-      ? rows.filter((r: any) => r.score === 4).slice(0, 10)
+      ? rows.filter((r) => Number(r.score) === 4).slice(0, 10)
       : rows
   });
 }
