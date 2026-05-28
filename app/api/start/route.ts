@@ -4,8 +4,10 @@ import { START_AT, END_AT } from '../../../lib/quiz';
 
 export async function POST(req: Request) {
   const now = new Date();
-  if (now < START_AT) return NextResponse.json({ error: 'Konkurs jeszcze się nie rozpoczął.' }, { status: 400 });
-  if (now > END_AT) return NextResponse.json({ error: 'Konkurs został zakończony.' }, { status: 400 });
+  // TEST: blokada daty wyłączona
+  // if (now < START_AT) return NextResponse.json({ error: 'Konkurs jeszcze się nie rozpoczął.' }, { status: 400 });
+  // if (now > END_AT) return NextResponse.json({ error: 'Konkurs został zakończony.' }, { status: 400 });
+
   const body = await req.json();
   const email = String(body.email || '').trim().toLowerCase();
   const first_name = String(body.first_name || '').trim();
