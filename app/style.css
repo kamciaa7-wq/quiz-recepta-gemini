@@ -1,4 +1,4 @@
-```css
+
 :root{
   --orange:#df5a09;
   --orangeDark:#cf4f00;
@@ -602,5 +602,4 @@ body{
     flex-direction:column;
     align-items:flex-start;
   }
-}
-```
+
