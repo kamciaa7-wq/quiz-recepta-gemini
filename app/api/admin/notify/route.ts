@@ -26,8 +26,8 @@ export async function POST(req: Request) {
     .from('quiz_attempts')
     .select('*')
     .eq('completed', true)
-    .eq('score', 4)
     .eq('notified', false)
+    .order('score', { ascending: false })
     .order('duration_ms', { ascending: true })
     .limit(3);
 
@@ -48,8 +48,7 @@ export async function POST(req: Request) {
         process.env.WINNERS_EMAIL_FROM ||
         'Konkurs <onboarding@resend.dev>',
       to: r.email,
-      subject:
-        'Wyniki konkursu – Test wiedzy o Recepcie Gemini',
+      subject: 'Wyniki konkursu – Test wiedzy o Recepcie Gemini',
       html: `
         <p>Dzień dobry ${r.first_name},</p>
 
@@ -59,7 +58,12 @@ export async function POST(req: Request) {
         </p>
 
         <p>
-          Podejdź do nas po nagrodę.
+          Twój wynik: <b>${r.score}</b><br/>
+          Twój czas: <b>${Math.floor((r.duration_ms || 0) / 60000)}:${String(Math.floor(((r.duration_ms || 0) / 1000) % 60)).padStart(2, '0')}</b>
+        </p>
+
+        <p>
+          Skontaktujemy się w sprawie nagrody.
         </p>
 
         <p>
