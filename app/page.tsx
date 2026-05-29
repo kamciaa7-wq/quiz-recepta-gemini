@@ -1,487 +1,490 @@
-
+```tsx
 'use client';
 
- 
-
 import { useMemo, useState } from 'react';
-
 import { QUIZ_TITLE, questions } from '../lib/quiz';
-
- 
 
 type Stage = 'home'|'form'|'quiz'|'done'|'ranking';
 
- 
-
 const fmt = (ms:number) => {
+  const s = Math.floor(ms / 1000);
 
-  const s = Math.floor(ms / 1000);
-
-  return `${String(Math.floor(s / 60)).padStart(2,'0')}:${String(s % 60).padStart(2,'0')}`;
-
+  return `${String(Math.floor(s / 60)).padStart(2,'0')}:${String(s % 60).padStart(2,'0')}`;
 };
-
- 
 
 const LOGO = '/Zrzut ekranu 2026-05-29 112620.png';
 
- 
-
 export default function Home(){
 
-  const [stage,setStage] = useState<Stage>('home');
+  const [stage,setStage] = useState<Stage>('home');
 
-  const [form,setForm] = useState({first_name:'',last_name:'',email:''});
+  const [form,setForm] = useState({
+    first_name:'',
+    last_name:'',
+    email:''
+  });
 
-  const [attempt,setAttempt] = useState('');
+  const [attempt,setAttempt] = useState('');
 
-  const [idx,setIdx] = useState(0);
+  const [idx,setIdx] = useState(0);
 
-  const [answers,setAnswers] = useState<Record<string,string>>({});
+  const [answers,setAnswers] = useState<Record<string,string>>({});
 
-  const [result,setResult] = useState<any>(null);
+  const [result,setResult] = useState<any>(null);
 
-  const [ranking,setRanking] = useState<any[]>([]);
+  const [ranking,setRanking] = useState<any[]>([]);
 
-  const [err,setErr] = useState('');
+  const [err,setErr] = useState('');
 
- 
+  const q = questions[idx];
 
-  const q = questions[idx];
+  const selected = q ? answers[q.id] : '';
 
-  const selected = q ? answers[q.id] : '';
+  async function start(){
 
- 
+    setErr('');
 
-  async function start(){
+    if(!form.first_name || !form.last_name || !form.email){
 
-    setErr('');
+      setErr('Uzupełnij wszystkie pola.');
 
- 
+      return;
+    }
 
-    if(!form.first_name || !form.last_name || !form.email){
+    const r = await fetch('/api/start',{
 
-      setErr('Uzupełnij wszystkie pola.');
+      method:'POST',
 
-      return;
+      headers:{
+        'Content-Type':'application/json'
+      },
 
-    }
+      body:JSON.stringify(form)
+    });
 
- 
+    const j = await r.json();
 
-    const r = await fetch('/api/start',{
+    if(!r.ok){
 
-      method:'POST',
+      setErr(j.error || 'Nie udało się rozpocząć quizu.');
 
-      headers:{'Content-Type':'application/json'},
+      return;
+    }
 
-      body:JSON.stringify(form)
+    setAttempt(j.id);
 
-    });
+    setStage('quiz');
+  }
 
- 
+  async function finish(){
 
-    const j = await r.json();
+    const r = await fetch('/api/submit',{
 
- 
+      method:'POST',
 
-    if(!r.ok){
+      headers:{
+        'Content-Type':'application/json'
+      },
 
-      setErr(j.error || 'Nie udało się rozpocząć quizu.');
+      body:JSON.stringify({
+        id:attempt,
+        answers
+      })
+    });
 
-      return;
+    const j = await r.json();
 
-    }
+    if(!r.ok){
 
- 
+      setErr(j.error || 'Nie udało się zapisać wyniku.');
 
-    setAttempt(j.id);
+      return;
+    }
 
-    setStage('quiz');
+    setResult(j);
 
-  }
+    setStage('done');
+  }
 
- 
+  async function showRanking(){
 
-  async function finish(){
+    const r = await fetch('/api/admin/results?public=1');
 
-    const r = await fetch('/api/submit',{
+    const j = await r.json();
 
-      method:'POST',
+    setRanking(j.results || []);
 
-      headers:{'Content-Type':'application/json'},
+    setStage('ranking');
+  }
 
-      body:JSON.stringify({id:attempt,answers})
+  const content = useMemo(()=>{
+
+    if(stage === 'home') return (
+
+      <>
+
+        <img
+          className="logoImg"
+          src={LOGO}
+          alt="Recepta Gemini"
+        />
+
+        <h1 className="titleSmall">
+          Test wiedzy<br/>
+          o Recepcie Gemini
+        </h1>
+
+        <p className="sub">
+          Sprawdź swoją wiedzę<br/>
+          i powalcz o nagrody!
+        </p>
+
+        <div className="infoCard">
+
+          <div>
+            📝 {questions.length} pytań
+          </div>
+
+          <div>
+            ⏱️ Najlepszy czas wygrywa
+          </div>
+
+        </div>
+
+        <button
+          className="btn"
+          onClick={()=>setStage('form')}
+        >
+          Rozpocznij quiz
+        </button>
+
+        <div className="orangeWave"/>
+
+      </>
+    );
+
+    if(stage === 'form') return (
+
+      <>
+
+        <img
+          className="logoImg"
+          src={LOGO}
+          alt="Recepta Gemini"
+        />
+
+        <h1 className="h1">
+          Zacznij quiz
+        </h1>
+
+        <p className="sub">
+          Wypełnij formularz, aby rozpocząć.
+        </p>
+
+        {err && (
+          <div className="error">
+            {err}
+          </div>
+        )}
+
+        <label className="label">
+          Imię
+        </label>
+
+        <input
+          className="input"
+          value={form.first_name}
+          onChange={e=>
+            setForm({
+              ...form,
+              first_name:e.target.value
+            })
+          }
+        />
+
+        <label className="label">
+          Nazwisko
+        </label>
+
+        <input
+          className="input"
+          value={form.last_name}
+          onChange={e=>
+            setForm({
+              ...form,
+              last_name:e.target.value
+            })
+          }
+        />
+
+        <label className="label">
+          Email
+        </label>
+
+        <input
+          className="input"
+          type="email"
+          value={form.email}
+          onChange={e=>
+            setForm({
+              ...form,
+              email:e.target.value
+            })
+          }
+        />
 
-    });
+        <button
+          className="btn"
+          onClick={start}
+        >
+          Rozpocznij quiz
+        </button>
 
- 
+        <div className="orangeWave"/>
+
+      </>
+    );
 
-    const j = await r.json();
+    if(stage === 'quiz') return (
 
- 
+      <>
 
-    if(!r.ok){
+        <img
+          className="logoImg"
+          src={LOGO}
+          alt="Recepta Gemini"
+        />
 
-      setErr(j.error || 'Nie udało się zapisać wyniku.');
+        <div className="quizTop">
 
-      return;
+          <span>
+            Pytanie {idx + 1}/{questions.length}
+          </span>
 
-    }
+          <span>
+            {fmt((idx + 1) * 10000)}
+          </span>
 
- 
+        </div>
 
-    setResult(j);
+        <div className="q">
+          {q.text}
+        </div>
 
-    setStage('done');
+        {q.answers.map(a=>(
 
-  }
+          <button
+            key={a.id}
+            className={
+              'answer ' +
+              (selected === a.id ? 'active' : '')
+            }
+            onClick={()=>
+              setAnswers({
+                ...answers,
+                [q.id]:a.id
+              })
+            }
+          >
 
- 
+            <span className="dot"/>
 
-  async function showRanking(){
+            <span>
+              {a.text}
+            </span>
 
-    const r = await fetch('/api/admin/results?public=1');
+          </button>
 
-    const j = await r.json();
+        ))}
 
- 
+        {err && (
+          <div className="error">
+            {err}
+          </div>
+        )}
 
-    setRanking(j.results || []);
+        <button
+          className="btn"
+          disabled={!selected}
+          onClick={()=>
 
-    setStage('ranking');
+            idx < questions.length - 1
 
-  }
+              ? setIdx(idx + 1)
 
- 
+              : finish()
+          }
+        >
 
-  const content = useMemo(()=>{
+          {idx < questions.length - 1
 
- 
+            ? 'Następne'
 
-    if(stage === 'home') return (
+            : 'Zakończ quiz'}
+        </button>
 
-      <>
+        <div className="orangeWave"/>
 
-        <img className="logoImg" src={LOGO} alt="Recepta Gemini" />
+      </>
+    );
 
- 
+    if(stage === 'done') return (
 
-        <div className="heroIcon">📘</div>
+      <>
 
- 
+        <img
+          className="logoImg"
+          src={LOGO}
+          alt="Recepta Gemini"
+        />
 
-        <h1 className="titleSmall">
+        <div className="trophy">
+          🏆
+        </div>
 
-          Test wiedzy<br/>o Recepcie Gemini
+        <h1 className="titleSmall">
+          Twój wynik
+        </h1>
 
-        </h1>
+        <p className="sub">
 
- 
+          Odpowiedziałaś poprawnie na<br/>
 
-        <p className="sub">
+          <b>
+            {result.score} z {questions.length} pytań
+          </b>
 
-          Sprawdź swoją wiedzę<br/>i powalcz o nagrody!
+        </p>
 
-        </p>
+        <div className="scoreBox">
 
- 
+          Twój czas:
 
-        <div className="infoCard">
+          <b>
+            {' '}
+            {fmt(result.duration_ms)}
+          </b>
 
-          <div>📝 4 pytania</div>
+        </div>
 
-          <div>⏱️ Najlepszy czas wygrywa</div>
+        <button
+          className="btn"
+          onClick={showRanking}
+        >
+          Zobacz ranking
+        </button>
 
+        <div className="orangeWave"/>
 
-        </div>
+      </>
+    );
 
- 
+    return (
 
-        <button className="btn" onClick={()=>setStage('form')}>
+      <>
 
-          Rozpocznij quiz
+        <img
+          className="logoImg"
+          src={LOGO}
+          alt="Recepta Gemini"
+        />
 
-        </button>
+        <h1 className="titleSmall">
+          Ranking
+        </h1>
 
- 
+        <div className="rankingCard">
 
-        <div className="orangeWave"/>
+          <table className="rank">
 
-      </>
+            <thead>
 
-    );
+              <tr>
 
- 
+                <th>#</th>
 
-    if(stage === 'form') return (
+                <th>
+                  Imię i nazwisko
+                </th>
 
-      <>
+                <th>
+                  Czas
+                </th>
 
-        <img className="logoImg" src={LOGO} alt="Recepta Gemini" />
+                <th>
+                  Wynik
+                </th>
 
- 
+              </tr>
 
-        <h1 className="h1">Zacznij quiz</h1>
+            </thead>
 
- 
+            <tbody>
 
-        <p className="sub">
+              {ranking.map((r,i)=>(
 
-          Wypełnij formularz, aby rozpocząć.
+                <tr key={r.id}>
 
-        </p>
+                  <td>
+                    {i + 1}
+                  </td>
 
- 
+                  <td>
+                    {r.first_name} {r.last_name}
+                  </td>
 
-        {err && <div className="error">{err}</div>}
+                  <td>
+                    {fmt(r.duration_ms)}
+                  </td>
 
- 
+                  <td>
+                    {r.score}/{questions.length}
+                  </td>
 
-        <label className="label">Imię</label>
+                </tr>
 
-        <input className="input" value={form.first_name} onChange={e=>setForm({...form,first_name:e.target.value})}/>
+              ))}
 
- 
+            </tbody>
 
-        <label className="label">Nazwisko</label>
+          </table>
 
-        <input className="input" value={form.last_name} onChange={e=>setForm({...form,last_name:e.target.value})}/>
+        </div>
 
- 
+        <button
+          className="btn secondary"
+          onClick={()=>setStage('home')}
+        >
+          Wróć
+        </button>
 
-        <label className="label">Email</label>
+      </>
+    );
 
-        <input className="input" type="email" value={form.email} onChange={e=>setForm({...form,email:e.target.value})}/>
+  },[
+    stage,
+    form,
+    idx,
+    answers,
+    err,
+    result,
+    ranking
+  ]);
 
- 
+  return (
 
-        <button className="btn" onClick={start}>
+    <main className="wrap">
 
-          Rozpocznij quiz
+      <section className="phone">
 
-        </button>
+        {content}
 
- 
+      </section>
 
-        <div className="orangeWave"/>
-
-      </>
-
-    );
-
- 
-
-    if(stage === 'quiz') return (
-
-      <>
-
-        <img className="logoImg" src={LOGO} alt="Recepta Gemini" />
-
- 
-
-        <div className="quizTop">
-
-          <span>Pytanie {idx + 1}/4</span>
-
-          <span>{fmt((idx + 1) * 10000)}</span>
-
-        </div>
-
- 
-
-        <div className="q">{q.text}</div>
-
- 
-
-        {q.answers.map(a=>(
-
-          <button
-
-            key={a.id}
-
-            className={'answer ' + (selected === a.id ? 'active' : '')}
-
-            onClick={()=>setAnswers({...answers,[q.id]:a.id})}
-
-          >
-
-            <span className="dot"/>
-
-            <span><b>{a.id.toUpperCase()}.</b> {a.text}</span>
-
-          </button>
-
-        ))}
-
- 
-
-        {err && <div className="error">{err}</div>}
-
- 
-
-        <button
-
-          className="btn"
-
-          disabled={!selected}
-
-          onClick={()=> idx < questions.length - 1 ? setIdx(idx + 1) : finish()}
-
-        >
-
-          {idx < questions.length - 1 ? 'Następne' : 'Zakończ quiz'}
-
-        </button>
-
- 
-
-        <div className="orangeWave"/>
-
-      </>
-
-    );
-
- 
-
-    if(stage === 'done') return (
-
-      <>
-
-        <img className="logoImg" src={LOGO} alt="Recepta Gemini" />
-
- 
-
-        <div className="trophy">🏆</div>
-
- 
-
-        <h1 className="titleSmall">Twój wynik</h1>
-
- 
-
-        <p className="sub">
-
-          Odpowiedziałaś poprawnie na<br/>
-
-          <b>{result.score} z 4 pytań</b>
-
-        </p>
-
- 
-
-        <div className="scoreBox">
-
-          Twój czas: <b>{fmt(result.duration_ms)}</b>
-
-        </div>
-
- 
-
-        <button className="btn" onClick={showRanking}>
-
-          Zobacz ranking
-
-        </button>
-
- 
-
-        <div className="orangeWave"/>
-
-      </>
-
-    );
-
- 
-
-    return (
-
-      <>
-
-        <img className="logoImg" src={LOGO} alt="Recepta Gemini" />
-
- 
-
-        <h1 className="titleSmall">Ranking</h1>
-
- 
-
-        <div className="rankingCard">
-
-          <table className="rank">
-
-            <thead>
-
-              <tr>
-
-                <th>#</th>
-
-                <th>Imię i nazwisko</th>
-
-                <th>Czas</th>
-
-                <th>Wynik</th>
-
-              </tr>
-
-            </thead>
-
-            <tbody>
-
-              {ranking.map((r,i)=>(
-
-                <tr key={r.id}>
-
-                  <td>{i + 1}</td>
-
-                  <td>{r.first_name} {r.last_name}</td>
-
-                  <td>{fmt(r.duration_ms)}</td>
-
-                  <td>{r.score}/4</td>
-
-                </tr>
-
-              ))}
-
-            </tbody>
-
-          </table>
-
-        </div>
-
- 
-
-        <button className="btn secondary" onClick={()=>setStage('home')}>
-
-          Wróć
-
-        </button>
-
-      </>
-
-    );
-
- 
-
-  },[stage,form,idx,answers,err,result,ranking]);
-
- 
-
-  return (
-
-    <main className="wrap">
-
-      <section className="phone">
-
-        {content}
-
-      </section>
-
-    </main>
-
-  );
-
+    </main>
+  );
 }
+```
+
 
 
