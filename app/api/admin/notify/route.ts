@@ -88,8 +88,7 @@ export async function POST(req: Request) {
         </p>
 
         <p>
-          Skontaktujemy się
-          w sprawie nagrody.
+          Podejdź do nas po nagrodę :).
         </p>
 
         <p>
