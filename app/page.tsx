@@ -224,5 +224,4 @@ export default function Home(){
     </main>
   );
 }
-IIS Windows Server
  
