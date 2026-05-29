@@ -1,4 +1,3 @@
-```ts
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '../../../../lib/supabase';
 import { Resend } from 'resend';
