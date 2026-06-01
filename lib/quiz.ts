@@ -85,8 +85,8 @@ export const questions = [
     id:'q8',
     text:'Czy przyrzekasz że będziesz dobrze realizował rezerwację Recepty Gemini?',
     answers:[
-      {id:'a',text:'Z całą pewnością TAK'},
-      {id:'b',text:'Oczywiście że tak'},
+      {id:'a',text:'NIEEE'},
+      {id:'b',text:'Oczywiście że NIEEE'},
       {id:'c',text:'Niech mnie klątwa faraona nawiedzi jeśli zrobię to źle'}
     ],
     correct:'c'
