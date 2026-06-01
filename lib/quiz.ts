@@ -65,31 +65,31 @@ export const questions = [
     text:'Jak są prezentowane ceny w Recepcie Gemini?',
     answers:[
       {id:'a',text:'Nie są prezentowane'},
-      {id:'b',text:'Są to ceny lokalne na konkretną aptekę'},
-      {id:'c',text:'Ceny są globalne na wszystkie apteki ustawione konkurencyjnie do DOZ'}
+      {id:'b',text:'Ceny są ustalane na podstawie średniej aptek '},
+      {id:'c',text:'Ceny są ustalane na podstawie konkurencji internetowej'}
     ],
     correct:'c'
   },
 
   {
     id:'q7',
-    text:'Po co prezentować ceny leków na stronie?',
+    text:'Jaki jest cel prezentowania cen leków na stronie?',
     answers:[
-      {id:'a',text:'Żeby wyłapać więcej pacjentów którzy lubią żyć online'},
-      {id:'b',text:'Żeby pracownikom aptek dostarczyć emocji w pracy'}
+      {id:'a',text:'Dzięki temu wychodzimy do Pacjentów szukających leków onilne'},
+      {id:'b',text:'Bo konkurecja tak ma'}
     ],
     correct:'a'
   },
 
   {
     id:'q8',
-    text:'Czy przyrzekasz że będziesz dobrze realizował rezerwację Recepty Gemini?',
+    text:'Jak zareagować kiedy nie jesteśmy w stanie zrealizować rezerwacji',
     answers:[
-      {id:'a',text:'NIEEE'},
-      {id:'b',text:'Oczywiście że NIEEE'},
-      {id:'c',text:'Niech mnie klątwa faraona nawiedzi jeśli zrobię to źle'}
+      {id:'a',text:'Nie reagować, nie potwierdzać rezerwacji czekać aż anuluje się sama po dwóch dniach'},
+      {id:'b',text:'Anulować rezerwacje, wysłać wiadomość skontaktować się z Pacjentem proponując rozwiązanie'}
+      
     ],
-    correct:'c'
+    correct:'b'
   }
 
 ];
