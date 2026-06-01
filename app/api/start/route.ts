@@ -9,7 +9,10 @@ export async function POST(req: Request) {
   const last_name = String(body.last_name || '').trim();
 
   if (!email || !first_name || !last_name) {
-    return NextResponse.json({ error: 'Brakuje danych.' }, { status: 400 });
+    return NextResponse.json(
+      { error: 'Uzupełnij wszystkie pola.' },
+      { status: 400 }
+    );
   }
 
   const sb = supabaseAdmin();
@@ -39,7 +42,20 @@ export async function POST(req: Request) {
     .single();
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    if (
+      error.message?.includes('duplicate key') ||
+      error.message?.includes('quiz_attempts_email_key')
+    ) {
+      return NextResponse.json(
+        { error: 'Ten email został już użyty w konkursie.' },
+        { status: 409 }
+      );
+    }
+
+    return NextResponse.json(
+      { error: error.message },
+      { status: 500 }
+    );
   }
 
   return NextResponse.json({ id: data.id });
