@@ -76,18 +76,29 @@ export const questions = [
     text:'Jaki jest cel prezentowania cen leków na stronie?',
     answers:[
       {id:'a',text:'Dzięki temu wychodzimy do Pacjentów szukających leków onilne'},
-      {id:'b',text:'Bo konkurecja tak ma'}
+      {id:'b',text:'W celu pokazania swoich cen konkurencji, by nas łatwiej zmapowali'},
+      {id:'c',text:'Pokazaliśmy ceny, ponieważ wszyscy tak robią '}
     ],
     correct:'a'
   },
 
   {
     id:'q8',
+    text:'Jaka wiadomość wysyłana jest do Użytkownika po kliknięciu anulowania Rezerwacji w Panelu Farmaceuty?',
+    answers:[
+      {id:'a',text:'Zawsze taka sama - nie ma możliwości modyfikacji, pomimo kilku opcji - informacja o braku możliwości zamówienia leku'},
+      {id:'b',text:'Nie ma takiej opcji'},
+      {id:'c',text:'Nic się nie wysyła, nawet po kliknięciu'}
+    ],
+    correct:'a'
+  },
+  {
+    id:'q9',
     text:'Jak zareagować kiedy nie jesteśmy w stanie zrealizować rezerwacji',
     answers:[
       {id:'a',text:'Nie reagować, nie potwierdzać rezerwacji czekać aż anuluje się sama po dwóch dniach'},
-      {id:'b',text:'Anulować rezerwacje, wysłać wiadomość skontaktować się z Pacjentem proponując rozwiązanie'}
-      
+      {id:'b',text:'Skontaktować się z Użytkownikiem telefonicznie, proponując rozwiązanie lub wyjaśniając decyzję'},
+      {id:'c',text:'Poinformować biuro obsługi klienta'}
     ],
     correct:'b'
   }
