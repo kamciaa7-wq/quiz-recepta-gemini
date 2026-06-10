@@ -8,7 +8,7 @@ export const questions = [
 
   {
     id:'q1',
-    text:'Jaki jest czas na przygotowanie rezerwacji złożonej przez Użytkownika?',
+    text:'Jaki jest czas na potwierdzenie rezerwacji złożonej przez Użytkownika?',
     answers:[
       {id:'a',text:'jeden dzień'},
       {id:'b',text:'dwa dni'},
